@@ -29,7 +29,7 @@ export default class AuthController {
                 .htmlView('emails/verify', {
                 token: verificationToken,
                 user: user,
-                url: `${env.get('FRONTEND_URL')}/auth/verify-email?token=${verificationToken}`,
+                url: `https://jm-todo-nextjs.vercel.app/auth/verify-email?token=${verificationToken}`,
             });
         });
         return response.status(201).json({
