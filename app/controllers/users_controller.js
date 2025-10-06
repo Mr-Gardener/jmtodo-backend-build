@@ -18,8 +18,6 @@ export default class UsersController {
         user.resetTokenExpiresAt = DateTime.utc().plus({ hours: 1 });
         await user.save();
 
-        const appUrl = process.env.FRONTEND_URL || 'http://localhost:3000'
-
         await mail.send((message) => {
             message
                 .from('"JMTodo" <info@demomailtrap.co>')
@@ -28,7 +26,6 @@ export default class UsersController {
                 .htmlView('emails/forgot_password', { 
                     user,
                     token,
-                url: `${appUrl}/auth/reset-password?token=${resetToken}`,
             });
         });
         return response.ok({ message: 'Password reset token sent to email' });
