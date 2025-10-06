@@ -38,7 +38,7 @@ export default class AuthController {
     }
 
     async verifyEmail({ request, response }) {
-        const token = request.input('token');
+        const token = request.qs().token;
         if (!token) {
             return response.badRequest({ message: 'No token provided' });
         }
