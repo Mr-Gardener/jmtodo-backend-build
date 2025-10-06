@@ -4,6 +4,8 @@ import { resetPasswordValidator } from '#validators/password';
 import crypto from 'node:crypto';
 import { DateTime } from 'luxon';
 import mail from '@adonisjs/mail/services/main';
+import env from '#start/env'
+
 export default class UsersController {
     async forgotPassword({ request, response }) {
         const { email } = await request.validateUsing(forgotPasswordValidator);
@@ -15,15 +17,23 @@ export default class UsersController {
         user.resetToken = token;
         user.resetTokenExpiresAt = DateTime.utc().plus({ hours: 1 });
         await user.save();
+
+        const appUrl = process.env.FRONTEND_URL || 'http://localhost:3000'
+
         await mail.send((message) => {
             message
                 .from('"JMTodo" <info@demomailtrap.co>')
                 .to(user.email)
                 .subject('Reset Your Password')
-                .htmlView('emails/forgot_password', { user, token });
+                .htmlView('emails/forgot_password', { 
+                    user,
+                    token,
+                url: `${appUrl}/auth/reset-password?token=${resetToken}`,
+            });
         });
         return response.ok({ message: 'Password reset token sent to email' });
     }
+
     async resetPassword({ request, response }) {
         const { token, password } = await request.validateUsing(resetPasswordValidator);
         const user = await User.findBy('resetToken', token);

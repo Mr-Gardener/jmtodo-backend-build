@@ -2,7 +2,10 @@ import User from '#models/user';
 import { createUserValidator } from '#validators/create_user_validator';
 import { randomUUID } from 'node:crypto';
 import mail from '@adonisjs/mail/services/main';
+import env from '#start/env'
+
 export default class AuthController {
+
     async register({ request, response }) {
         const payload = await request.validateUsing(createUserValidator);
         const existingUser = await User.findBy('email', payload.email);
@@ -26,13 +29,14 @@ export default class AuthController {
                 .htmlView('emails/verify', {
                 token: verificationToken,
                 user: user,
-                url: `http://localhost:3000/auth/verify-email?token=${verificationToken}`,
+                url: `${env.get('FRONTEND_URL')}/auth/verify-email?token=${verificationToken}`,
             });
         });
         return response.status(201).json({
             message: 'Registration successful. Please check your email to verify your account.',
         });
     }
+
     async verifyEmail({ request, response }) {
         const token = request.input('token');
         if (!token) {
